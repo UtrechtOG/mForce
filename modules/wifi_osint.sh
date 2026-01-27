@@ -1,24 +1,19 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
-echo "[*] WiFi OSINT - Passive Recon"
+echo "[*] mForce WiFi OSINT (No-Root Mode)"
+echo "[*] Using Android WiFi API"
 echo
 
-if ! command -v iw >/dev/null 2>&1; then
-  echo "[*] Installing dependency: iw"
-  pkg install iw -y
-fi
-
-interfaces=$(iw dev 2>/dev/null | grep Interface | awk '{print $2}')
-
-if [ -z "$interfaces" ]; then
-  echo "[!] No wireless interface found"
-  echo "[!] Root or compatible device required"
+if ! command -v termux-wifi-scaninfo >/dev/null 2>&1; then
+  echo "[!] termux-api not installed"
+  echo "[*] Install with: pkg install termux-api"
   exit 1
 fi
 
-for iface in $interfaces; do
-  echo "[+] Interface: $iface"
-  iw dev "$iface" scan 2>/dev/null | \
-  grep -E "BSS|SSID|signal" | sed 's/\t//g'
-  echo "---------------------------"
-done
+echo "[*] Scanning nearby WiFi networks..."
+echo
+
+termux-wifi-scaninfo | jq -r '
+.[] |
+"SSID: \(.ssid // "Hidden")\nBSSID: \(.bssid)\nSignal: \(.level) dBm\nSecurity: \(.capabilities)\n------------------------"
+'
