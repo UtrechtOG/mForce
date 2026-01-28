@@ -1,10 +1,20 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
-echo "[*] mForce WiFi OSINT (No-Root Mode)"
-echo "[*] Using Android WiFi API"
+# Colors (safe, no dependencies)
+BOLD="\033[1m"
+CYAN="\033[36m"
+GREEN="\033[32m"
+YELLOW="\033[33m"
+NC="\033[0m"
+
+echo
+echo -e "${BOLD}${CYAN}==============================================${NC}"
+echo -e "${BOLD}${CYAN}        mForce | WiFi OSINT Scanner${NC}"
+echo -e "${CYAN}   Passive Wireless Recon (No-Root)${NC}"
+echo -e "${BOLD}${CYAN}==============================================${NC}"
 echo
 
-# Dependencies
+# Dependency checks
 if ! command -v termux-wifi-scaninfo >/dev/null 2>&1; then
   echo "[!] termux-api not installed"
   echo "[*] Install with: pkg install termux-api"
@@ -16,35 +26,38 @@ if ! command -v jq >/dev/null 2>&1; then
   pkg install jq -y
 fi
 
-# Progress bar function
-progress_bar() {
-  for i in 10 20 30 40 50 60 70 80 90; do
-    printf "\r[*] Scanning WiFi networks: [%-10s] %d%%" "##########" "$i"
-    sleep 0.15
-  done
-}
-
+echo -e "${YELLOW}[*] Scanning nearby WiFi networks...${NC}"
 echo
-progress_bar &
 
-# Run scan while progress bar animates
-termux-wifi-scaninfo 2>/dev/null > /tmp/mforce_wifi.json
+RAW_OUTPUT=$(termux-wifi-scaninfo 2>/dev/null)
 
-wait
-printf "\r[*] Scanning WiFi networks: [##########] 100%% ✔\n\n"
-
-RAW_OUTPUT=$(cat /tmp/mforce_wifi.json)
-rm -f /tmp/mforce_wifi.json
-
-# Validate JSON
 if ! echo "$RAW_OUTPUT" | grep -q '\['; then
   echo "[!] Failed to retrieve WiFi data"
-  echo "[!] Check WiFi + Termux:API permissions"
+  echo "[!] Check WiFi & permissions"
   exit 1
 fi
 
-# Output results
+# Table header
+printf "${BOLD}%-4s %-22s %-19s %-10s %-25s${NC}\n" \
+"ID" "SSID" "BSSID" "SIGNAL" "SECURITY"
+printf "%-4s %-22s %-19s %-10s %-25s\n" \
+"----" "----------------------" "-------------------" "----------" "-------------------------"
+
+# Table rows
 echo "$RAW_OUTPUT" | jq -r '
 .[] |
-"SSID: \(.ssid // "<hidden>")\nBSSID: \(.bssid)\nSignal: \(.level // "unknown") dBm\nSecurity: \(.capabilities)\n------------------------"
-'
+[
+  (.ssid // "<hidden>"),
+  .bssid,
+  (.level // "N/A"),
+  .capabilities
+] | @tsv
+' | nl -w2 -s'. ' | while IFS=$'\t' read -r id ssid bssid level sec; do
+  printf "%-4s %-22.22s %-19s %-10s %-25.25s\n" \
+  "$id" "$ssid" "$bssid" "$level dBm" "$sec"
+done
+
+# Footer
+COUNT=$(echo "$RAW_OUTPUT" | jq length)
+echo
+echo -e "${GREEN}[*] Networks found:${NC} $COUNT"
