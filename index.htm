@@ -5,47 +5,54 @@
   <title>mForce • Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="web/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<div class="auth-container">
+<div class="auth-wrap">
   <div class="auth-card">
-
     <h1>mForce</h1>
     <p class="subtitle">MultiForce Security Framework</p>
 
     <!-- LOGIN -->
-    <form id="login-form">
-      <h2>Login</h2>
+    <div id="loginBox">
+      <input id="loginEmail" type="email" placeholder="Email" required>
+      <input id="loginPassword" type="password" placeholder="Password" required>
 
-      <input type="email" placeholder="Email" required>
-      <input type="password" placeholder="Password" required>
+      <label class="robot">
+        <input type="checkbox" id="robotLogin">
+        <span>I’m not a robot</span>
+      </label>
 
-      <button type="submit">Login</button>
+      <button id="loginBtn">Login</button>
+
+      <div class="divider">or</div>
+
+      <button id="googleLogin" class="google-btn">Continue with Google</button>
 
       <p class="switch">
         Don’t have an account?
-        <span onclick="showRegister()">Register</span>
+        <span id="showRegister">Register</span>
       </p>
-    </form>
+    </div>
 
     <!-- REGISTER -->
-    <form id="register-form" class="hidden">
-      <h2>Create Account</h2>
+    <div id="registerBox" class="hidden">
+      <input id="regName" type="text" placeholder="Name" required>
+      <input id="regEmail" type="email" placeholder="Email" required>
+      <input id="regPassword" type="password" placeholder="Password" required>
 
-      <input type="text" placeholder="Name" required>
-      <input type="email" placeholder="Email" required>
-      <input type="password" placeholder="Password" required>
+      <label class="robot">
+        <input type="checkbox" id="robotRegister">
+        <span>I’m not a robot</span>
+      </label>
 
-      <button type="submit">Register</button>
+      <button id="registerBtn">Create Account</button>
 
       <p class="switch">
         Already have an account?
-        <span onclick="showLogin()">Login</span>
+        <span id="showLogin">Login</span>
       </p>
-    </form>
-
+    </div>
   </div>
 </div>
 
