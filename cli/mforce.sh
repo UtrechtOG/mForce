@@ -1,5 +1,9 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
+# ===== Path handling (VERY IMPORTANT) =====
+BASE_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+MODULES_DIR="$BASE_DIR/modules"
+
 # ===== Colors =====
 HDR="\033[38;5;45m"
 INFO="\033[38;5;39m"
@@ -19,7 +23,7 @@ echo -e "${HDR}mForce${NC} • MultiForce Security Framework"
 echo -e "${MUTED}────────────────────────────────────────────────────────────────────────${NC}"
 echo -e "${INFO}▸ Platform${NC} : Termux (Android)"
 echo -e "${INFO}▸ Language${NC} : Shell"
-echo -e "${INFO}▸ Mode${NC}     : OSINT / Recon / Defense / Offensive"
+echo -e "${INFO}▸ Mode${NC}     : OSINT / Defense / Offensive"
 echo -e "${MUTED}────────────────────────────────────────────────────────────────────────${NC}"
 echo -e "${INFO}▸ Framework${NC} : mForce ${VERSION}"
 echo
@@ -76,21 +80,23 @@ echo
 
 case "$OPTION" in
   "*") exit 0 ;;
-  1)  bash modules/wifi_osint.sh ;;
-  2)  bash modules/ap_fingerprint.sh ;;
-  3)  bash modules/ble_osint.sh ;;
-  4)  bash modules/device_presence.sh ;;
-  5)  bash modules/vendor_intel.sh ;;
-  6)  bash modules/password_generator.sh ;;
-  7)  bash modules/ip_osint.sh ;;
-  8)  bash modules/domain_osint.sh ;;
-  9)  bash modules/username_osint.sh ;;
-  10) bash modules/environment_type.sh ;;
-  11) bash modules/code_security.sh ;;
-  12) bash modules/password_analyzer.sh ;;
-  13) bash modules/http_headers.sh ;;
-  14) bash modules/subdomain_enum.sh ;;
-  15) bash modules/public_exposure.sh ;;
-  16) bash modules/config_leak_detector.sh ;;
+
+  1)  bash "$MODULES_DIR/wifi_osint.sh" ;;
+  2)  bash "$MODULES_DIR/ap_fingerprint.sh" ;;
+  3)  bash "$MODULES_DIR/ble_osint.sh" ;;
+  4)  bash "$MODULES_DIR/device_presence.sh" ;;
+  5)  bash "$MODULES_DIR/vendor_intel.sh" ;;
+  6)  bash "$MODULES_DIR/password_generator.sh" ;;
+  7)  bash "$MODULES_DIR/ip_osint.sh" ;;
+  8)  bash "$MODULES_DIR/domain_osint.sh" ;;
+  9)  bash "$MODULES_DIR/username_osint.sh" ;;
+  10) bash "$MODULES_DIR/environment_type.sh" ;;
+  11) bash "$MODULES_DIR/code_security.sh" ;;
+  12) bash "$MODULES_DIR/password_analyzer.sh" ;;
+  13) bash "$MODULES_DIR/http_headers.sh" ;;
+  14) bash "$MODULES_DIR/subdomain_enum.sh" ;;
+  15) bash "$MODULES_DIR/public_exposure.sh" ;;
+  16) bash "$MODULES_DIR/config_leak_detector.sh" ;;
+
   *)  echo -e "${WARN}[!] Invalid option${NC}" ;;
 esac
