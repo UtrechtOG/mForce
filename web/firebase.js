@@ -1,6 +1,5 @@
-// Firebase SDKs
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -13,8 +12,5 @@ const firebaseConfig = {
   measurementId: "G-VB5R5N4H62"
 };
 
-// Init
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
-export { auth };
+export const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
