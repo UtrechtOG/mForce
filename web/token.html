@@ -2,26 +2,65 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>mForce • Access Token</title>
+  <title>mForce • Token</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="page-container">
-  <h1>mForce Access Token</h1>
+  <h1>Your mForce Token</h1>
+  <p class="subtitle">Use this token to unlock the mForce CLI</p>
 
-  <div class="token-box">
-    <code>mf_xxxxxxxxxxxxxxxxx</code>
-    <button onclick="copyToken()">Copy</button>
-  </div>
+  <pre id="tokenBox">loading...</pre>
+
+  <button onclick="copyToken()">Copy Token</button>
 
   <div class="nav-links">
-    <a href="about.html">About mForce</a>
+    <a href="about.html">About</a>
     <a href="../index.html">Logout</a>
   </div>
 </div>
 
-<script src="script.js"></script>
+<script type="module">
+  import { auth, db } from "./firebase.js";
+  import { onAuthStateChanged } from
+    "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+  import { doc, getDoc } from
+    "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+  const tokenBox = document.getElementById("tokenBox");
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      tokenBox.innerText = "Not logged in";
+      return;
+    }
+
+    try {
+      const ref = doc(db, "users", user.uid);
+      const snap = await getDoc(ref);
+
+      if (!snap.exists() || !snap.data().token) {
+        tokenBox.innerText = "Token not found";
+        return;
+      }
+
+      tokenBox.innerText = snap.data().token;
+    } catch (err) {
+      tokenBox.innerText = "Error loading token";
+      console.error(err);
+    }
+  });
+
+  window.copyToken = () => {
+    const token = tokenBox.innerText;
+    if (!token || token === "loading...") return;
+
+    navigator.clipboard.writeText(token);
+    alert("Token copied to clipboard");
+  };
+</script>
+
 </body>
 </html>
