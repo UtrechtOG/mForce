@@ -33,15 +33,17 @@ echo -e "${MUTED}─────────────────────
 echo
 
 # -------- Menu --------
-echo -e "${INFO}[1]${NC} WiFi OSINT"
-echo -e "${INFO}[2]${NC} Access Point Fingerprinting"
-echo -e "${INFO}[3]${NC} BLE OSINT ${MUTED}(experimental)${NC}"
-echo -e "${INFO}[4]${NC} Device Presence Analysis"
-echo -e "${INFO}[5]${NC} Vendor Intelligence"
-echo -e "${INFO}[6]${NC} Secure Password Generator"
-echo -e "${INFO}[7]${NC} IP / Network OSINT"
-echo -e "${INFO}[8]${NC} Domain OSINT"
-echo -e "${INFO}[0]${NC} Exit"
+echo -e "${INFO}[1]${NC}  WiFi OSINT"
+echo -e "${INFO}[2]${NC}  Access Point Fingerprinting"
+echo -e "${INFO}[3]${NC}  BLE OSINT ${MUTED}(experimental)${NC}"
+echo -e "${INFO}[4]${NC}  Device Presence Analysis"
+echo -e "${INFO}[5]${NC}  Vendor Intelligence"
+echo -e "${INFO}[6]${NC}  Secure Password Generator"
+echo -e "${INFO}[7]${NC}  IP / Network OSINT"
+echo -e "${INFO}[8]${NC}  Domain OSINT"
+echo -e "${INFO}[9]${NC}  Username OSINT"
+echo -e "${INFO}[10]${NC} Environment Type Detection"
+echo -e "${INFO}[0]${NC}  Exit"
 echo
 
 read -p "mForce ▸ " OPTION
@@ -72,6 +74,12 @@ case "$OPTION" in
     ;;
   8)
     bash modules/domain_osint.sh
+    ;;
+  9)
+    bash modules/username_osint.sh
+    ;;
+  10)
+    bash modules/environment_type.sh
     ;;
   0)
     echo -e "${MUTED}Exiting mForce...${NC}"
