@@ -22,30 +22,25 @@ command -v jq >/dev/null 2>&1 || pkg install jq -y
 RAW=$(termux-wifi-scaninfo 2>/dev/null)
 echo "$RAW" | grep -q '\[' || { echo "[!] WiFi scan failed"; exit 1; }
 
-# Group by SSID and analyze
+# jq does ALL grouping + formatting safely
 echo "$RAW" | jq -r '
 group_by(.ssid)[] |
-{
-  ssid: (.[0].ssid // "<hidden>"),
-  aps: length,
-  caps: (.[0].capabilities),
-  bssid: (.[0].bssid)
-}
-' | while read -r block; do
-
-  SSID=$(echo "$block" | jq -r '.ssid')
-  APS=$(echo "$block" | jq -r '.aps')
-  CAPS=$(echo "$block" | jq -r '.caps')
-  BSSID=$(echo "$block" | jq -r '.bssid')
+[
+  (.[0].ssid // "<hidden>"),
+  length,
+  (.[0].capabilities),
+  (.[0].bssid)
+] | @tsv
+' | while IFS=$'\t' read -r SSID APS CAPS BSSID; do
 
   OUI=${BSSID:0:8}
 
-  # -------- Vendor Detection (Improved) --------
+  # Vendor detection
   VENDOR="Unknown / Generic"
   CATEGORY="Consumer"
 
   case "$OUI" in
-    7C:FF:4D|7c:ff:4d)
+    7C:FF:4D|7c:ff:4d|D4:24:DD)
       VENDOR="AVM (FRITZ!Box)"
       CATEGORY="Consumer"
       ;;
@@ -57,17 +52,13 @@ group_by(.ssid)[] |
       VENDOR="Vodafone"
       CATEGORY="ISP Router"
       ;;
-    D4:24:DD)
-      VENDOR="AVM (FRITZ!Box)"
-      CATEGORY="Consumer"
-      ;;
     00:1B:67|00:1F:90)
       VENDOR="Ubiquiti"
       CATEGORY="Enterprise"
       ;;
   esac
 
-  # -------- Security Analysis --------
+  # Security
   WPA="WPA2"
   [[ "$CAPS" == *"WPA3"* ]] && WPA="WPA3 / Mixed"
 
@@ -77,25 +68,21 @@ group_by(.ssid)[] |
   TOPOLOGY="Single AP"
   [[ "$APS" -gt 1 ]] && TOPOLOGY="Mesh / Repeater"
 
-  # -------- Risk Scoring (0–10) --------
-  RISK_SCORE=0
+  # Risk score
+  RISK=0
+  [[ "$WPA" == "WPA2" ]] && ((RISK+=2))
+  [[ "$WPS" == "Yes" ]] && ((RISK+=3))
+  [[ "$CATEGORY" == "ISP Router" ]] && ((RISK+=1))
+  [[ "$TOPOLOGY" == "Mesh / Repeater" ]] && ((RISK+=1))
+  [[ "$SSID" == "<hidden>" ]] && ((RISK+=1))
+  [[ "$RISK" -gt 10 ]] && RISK=10
 
-  [[ "$WPA" == "WPA2" ]] && ((RISK_SCORE+=2))
-  [[ "$WPS" == "Yes" ]] && ((RISK_SCORE+=3))
-  [[ "$CATEGORY" == "ISP Router" ]] && ((RISK_SCORE+=1))
-  [[ "$TOPOLOGY" == "Mesh / Repeater" ]] && ((RISK_SCORE+=1))
-  [[ "$SSID" == "<hidden>" ]] && ((RISK_SCORE+=1))
+  LABEL="Low"
+  COLOR=$SUCCESS
+  [[ "$RISK" -ge 3 ]] && LABEL="Medium" && COLOR=$WARN
+  [[ "$RISK" -ge 6 ]] && LABEL="High" && COLOR=$DANGER
 
-  # Clamp
-  [[ "$RISK_SCORE" -gt 10 ]] && RISK_SCORE=10
-
-  # Risk Label
-  RISK_LABEL="Low"
-  RISK_COLOR=$SUCCESS
-  [[ "$RISK_SCORE" -ge 3 ]] && RISK_LABEL="Medium" && RISK_COLOR=$WARN
-  [[ "$RISK_SCORE" -ge 6 ]] && RISK_LABEL="High" && RISK_COLOR=$DANGER
-
-  # -------- Output --------
+  # Output
   echo -e "${ACCENT}SSID${NC}            : ${BOLD}$SSID${NC}"
   echo -e "${INFO}Vendor${NC}          : $VENDOR"
   echo -e "${INFO}Category${NC}        : $CATEGORY"
@@ -103,7 +90,7 @@ group_by(.ssid)[] |
   echo -e "${INFO}Topology${NC}        : $TOPOLOGY"
   echo -e "${INFO}Security${NC}        : $WPA"
   echo -e "${INFO}WPS Enabled${NC}     : $WPS"
-  echo -e "${INFO}Risk Score${NC}      : ${RISK_COLOR}$RISK_SCORE / 10 ($RISK_LABEL)${NC}"
+  echo -e "${INFO}Risk Score${NC}      : ${COLOR}$RISK / 10 ($LABEL)${NC}"
   echo -e "${MUTED}------------------------------------------------------------${NC}"
 
 done
