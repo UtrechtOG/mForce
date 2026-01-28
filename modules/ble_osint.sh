@@ -14,14 +14,26 @@ echo -e "${BOLD}${ACCENT}BLE OSINT${NC}"
 echo -e "${MUTED}Passive Bluetooth Low Energy reconnaissance${NC}"
 echo
 
-# Deps
-command -v termux-bluetooth-scaninfo >/dev/null 2>&1 || {
-  echo "[!] termux-api missing"; exit 1;
-}
+# ===== Feature Detection =====
+if ! command -v termux-bluetooth-scaninfo >/dev/null 2>&1; then
+  echo -e "${WARN}[!] BLE OSINT unavailable on this device${NC}"
+  echo -e "${MUTED}Reason : Android 14+/Termux API limitation${NC}"
+  echo -e "${MUTED}Status : Feature gracefully disabled${NC}"
+  echo
+  exit 0
+fi
+
+# Dependencies
 command -v jq >/dev/null 2>&1 || pkg install jq -y
 
 RAW=$(termux-bluetooth-scaninfo 2>/dev/null)
-echo "$RAW" | grep -q '\[' || { echo "[!] BLE scan failed"; exit 1; }
+
+# Safety check
+echo "$RAW" | grep -q '\[' || {
+  echo -e "${WARN}[!] BLE scan failed${NC}"
+  echo -e "${MUTED}Bluetooth may be disabled or restricted${NC}"
+  exit 0
+}
 
 # Counters
 TOTAL=0
@@ -42,17 +54,17 @@ echo "$RAW" | jq -r '
 ' | while IFS=$'\t' read -r NAME CLASS RSSI MFG; do
   ((TOTAL++))
 
-  # Signal bucket
+  # Signal strength
   SIGNAL="Weak"
   [[ "$RSSI" -ge -60 ]] && SIGNAL="Strong"
   [[ "$RSSI" -lt -60 && "$RSSI" -ge -80 ]] && SIGNAL="Medium"
 
-  # Type heuristic
+  # Device type heuristic
   TYPE="Unknown"
   [[ "$CLASS" == *"phone"* || "$NAME" == *"iPhone"* || "$NAME" == *"Android"* ]] && TYPE="Smartphone"
   [[ "$CLASS" == *"audio"* || "$NAME" == *"JBL"* || "$NAME" == *"Sony"* ]] && TYPE="Audio Device"
   [[ "$CLASS" == *"watch"* || "$NAME" == *"Watch"* ]] && TYPE="Smartwatch"
-  [[ "$NAME" == *"Beacon"* || "$MFG" != "" ]] && TYPE="Beacon / IoT"
+  [[ "$MFG" != "" ]] && TYPE="Beacon / IoT"
 
   case "$TYPE" in
     Smartphone) ((PHONES++)) ;;
@@ -77,6 +89,7 @@ echo "$RAW" | jq -r '
   echo -e "${MUTED}----------------------------------------${NC}"
 done
 
+echo
 echo -e "${SUCCESS}Summary${NC}"
 echo -e "${INFO}Devices Detected${NC} : $TOTAL"
 echo -e "${INFO}Smartphones${NC}      : $PHONES"
