@@ -1,1 +1,95 @@
+* {
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
 
+body {
+  margin: 0;
+  background: #0b0f14;
+  color: #e6e6e6;
+}
+
+.auth-container,
+.page-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.auth-card,
+.page-container {
+  background: #121822;
+  padding: 40px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 0 40px rgba(0,0,0,0.6);
+}
+
+h1 {
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  color: #8fa2c8;
+  margin-bottom: 25px;
+}
+
+h2 {
+  margin-bottom: 15px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  background: #0b0f14;
+  border: 1px solid #2a3244;
+  color: #fff;
+  border-radius: 6px;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background: #4da6ff;
+  border: none;
+  color: #000;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.switch {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.switch span {
+  color: #4da6ff;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+.token-box {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.token-box code {
+  background: #0b0f14;
+  padding: 10px;
+  border-radius: 6px;
+  flex: 1;
+}
+
+.nav-links {
+  display: flex;
+  justify-content: space-between;
+}
