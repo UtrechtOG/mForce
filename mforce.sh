@@ -29,11 +29,7 @@ echo -e "${SUCCESS}Passive · Modular · Android-Native${NC}"
 echo
 echo -e "${MUTED}────────────────────────────────────────────────${NC}"
 echo -e "${INFO}▸ Framework${NC} : mForce ${SUCCESS}${VERSION}${NC}"
-echo -e "${INFO}▸ Platform${NC}  : Termux (Android)"
-echo -e "${INFO}▸ Language${NC}  : Shell"
-echo -e "${INFO}▸ Mode${NC}      : OSINT / Recon"
 echo -e "${MUTED}────────────────────────────────────────────────${NC}"
-echo -e "${SUCCESS}Passive · Modular · Android-Native${NC}"
 echo
 
 # -------- Menu --------
@@ -42,6 +38,8 @@ echo -e "${INFO}[2]${NC} Access Point Fingerprinting"
 echo -e "${INFO}[3]${NC} BLE OSINT ${MUTED}(experimental)${NC}"
 echo -e "${INFO}[4]${NC} Device Presence Analysis"
 echo -e "${INFO}[5]${NC} Vendor Intelligence"
+echo -e "${INFO}[6]${NC} Secure Password Generator"
+echo -e "${INFO}[7]${NC} IP / Network OSINT"
 echo -e "${INFO}[0]${NC} Exit"
 echo
 
@@ -64,6 +62,12 @@ case "$OPTION" in
     ;;
   5)
     bash modules/vendor_intel.sh
+    ;;
+  6)
+    bash modules/password_generator.sh
+    ;;
+  7)
+    bash modules/ip_osint.sh
     ;;
   0)
     echo -e "${MUTED}Exiting mForce...${NC}"
