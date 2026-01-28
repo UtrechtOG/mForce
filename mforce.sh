@@ -1,42 +1,55 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
-# ==============================
-# mForce Version
-# ==============================
-MFORCE_VERSION="v0.02.7-alpha"
+# ===============================
+# mForce Core
+# MultiForce Security Framework
+# ===============================
 
-# Load core
-source core/colors.sh 2>/dev/null
-source core/banner.sh 2>/dev/null
+# -------- Colors --------
+ACCENT="\033[38;5;45m"
+INFO="\033[38;5;39m"
+SUCCESS="\033[38;5;82m"
+WARN="\033[38;5;214m"
+MUTED="\033[38;5;240m"
+BOLD="\033[1m"
+NC="\033[0m"
 
-# Fallback colors
-ACCENT=${ACCENT:-"\033[38;5;45m"}
-NC=${NC:-"\033[0m"}
-GREEN=${GREEN:-"\033[38;5;82m"}
-MUTED=${MUTED:-"\033[38;5;240m"}
+VERSION="v0.02.7-alpha"
 
 clear
-banner
 
+# -------- Header --------
+echo -e "${ACCENT}mForce${NC} • MultiForce Security Framework"
 echo -e "${MUTED}────────────────────────────────────────────────${NC}"
-echo -e "${ACCENT}▸ Framework${NC} : mForce ${GREEN}${MFORCE_VERSION}${NC}"
-echo -e "${ACCENT}▸ Platform ${NC}: Termux (Android)"
-echo -e "${ACCENT}▸ Language ${NC}: Shell"
-echo -e "${ACCENT}▸ Mode     ${NC}: OSINT / Recon"
+echo -e "${INFO}▸ Platform${NC} : Termux (Android)"
+echo -e "${INFO}▸ Language${NC} : Shell"
+echo -e "${INFO}▸ Mode${NC}     : OSINT / Recon"
 echo -e "${MUTED}────────────────────────────────────────────────${NC}"
-echo -e "${GREEN}Passive · Modular · Android-Native${NC}"
+echo -e "${SUCCESS}Passive · Modular · Android-Native${NC}"
+echo
+echo -e "${MUTED}────────────────────────────────────────────────${NC}"
+echo -e "${INFO}▸ Framework${NC} : mForce ${SUCCESS}${VERSION}${NC}"
+echo -e "${INFO}▸ Platform${NC}  : Termux (Android)"
+echo -e "${INFO}▸ Language${NC}  : Shell"
+echo -e "${INFO}▸ Mode${NC}      : OSINT / Recon"
+echo -e "${MUTED}────────────────────────────────────────────────${NC}"
+echo -e "${SUCCESS}Passive · Modular · Android-Native${NC}"
 echo
 
-echo -e "${ACCENT}[1]${NC} WiFi OSINT"
-echo -e "${ACCENT}[2]${NC} Access Point Fingerprinting"
-echo -e "${ACCENT}[3]${NC} BLE OSINT"
-echo -e "${ACCENT}[0]${NC} Exit"
+# -------- Menu --------
+echo -e "${INFO}[1]${NC} WiFi OSINT"
+echo -e "${INFO}[2]${NC} Access Point Fingerprinting"
+echo -e "${INFO}[3]${NC} BLE OSINT ${MUTED}(experimental)${NC}"
+echo -e "${INFO}[4]${NC} Device Presence Analysis"
+echo -e "${INFO}[5]${NC} Vendor Intelligence"
+echo -e "${INFO}[0]${NC} Exit"
 echo
 
-read -p "mForce ▸ " choice
+read -p "mForce ▸ " OPTION
 echo
 
-case "$choice" in
+# -------- Router --------
+case "$OPTION" in
   1)
     bash modules/wifi_osint.sh
     ;;
@@ -46,11 +59,17 @@ case "$choice" in
   3)
     bash modules/ble_osint.sh
     ;;
+  4)
+    bash modules/device_presence.sh
+    ;;
+  5)
+    bash modules/vendor_intel.sh
+    ;;
   0)
-    echo -e "${MUTED}Exiting mForce ${MFORCE_VERSION}...${NC}"
+    echo -e "${MUTED}Exiting mForce...${NC}"
     exit 0
     ;;
   *)
-    echo -e "[!] Invalid option"
+    echo -e "${WARN}[!] Invalid option${NC}"
     ;;
 esac
