@@ -40,6 +40,7 @@ echo -e "${INFO}[4]${NC} Device Presence Analysis"
 echo -e "${INFO}[5]${NC} Vendor Intelligence"
 echo -e "${INFO}[6]${NC} Secure Password Generator"
 echo -e "${INFO}[7]${NC} IP / Network OSINT"
+echo -e "${INFO}[8]${NC} Domain OSINT"
 echo -e "${INFO}[0]${NC} Exit"
 echo
 
@@ -68,6 +69,9 @@ case "$OPTION" in
     ;;
   7)
     bash modules/ip_osint.sh
+    ;;
+  8)
+    bash modules/domain_osint.sh
     ;;
   0)
     echo -e "${MUTED}Exiting mForce...${NC}"
