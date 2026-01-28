@@ -21,18 +21,31 @@ echo
   exit 0
 }
 
-# Resolve domain → IP if needed
-IP="$TARGET"
-if [[ "$TARGET" =~ [a-zA-Z] ]]; then
-  IP=$(getent hosts "$TARGET" | awk '{print $1}' | head -n1)
-  if [[ -z "$IP" ]]; then
-    echo -e "${WARN}[!] Failed to resolve domain${NC}"
-    exit 0
-  fi
+# -------- Detect IP vs Domain --------
+IP=""
+
+# IPv4
+if [[ "$TARGET" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
+  IP="$TARGET"
 fi
 
-# Query public OSINT API (no key needed)
-DATA=$(curl -s "http://ip-api.com/json/$IP?fields=status,message,continent,country,regionName,city,zip,lat,lon,isp,org,as,reverse,mobile,proxy,hosting")
+# IPv6
+if [[ "$TARGET" =~ : ]]; then
+  IP="$TARGET"
+fi
+
+# Domain → resolve via API
+if [[ -z "$IP" ]]; then
+  RESOLVE=$(curl -s "https://dns.google/resolve?name=$TARGET&type=A" | jq -r '.Answer[0].data')
+  [[ -z "$RESOLVE" || "$RESOLVE" == "null" ]] && {
+    echo -e "${WARN}[!] Failed to resolve domain${NC}"
+    exit 0
+  }
+  IP="$RESOLVE"
+fi
+
+# -------- OSINT Lookup --------
+DATA=$(curl -s "http://ip-api.com/json/$IP?fields=status,message,country,regionName,city,lat,lon,isp,org,as,reverse,mobile,proxy,hosting")
 
 STATUS=$(echo "$DATA" | jq -r '.status')
 [[ "$STATUS" != "success" ]] && {
@@ -40,7 +53,6 @@ STATUS=$(echo "$DATA" | jq -r '.status')
   exit 0
 }
 
-# Extract
 COUNTRY=$(echo "$DATA" | jq -r '.country')
 REGION=$(echo "$DATA" | jq -r '.regionName')
 CITY=$(echo "$DATA" | jq -r '.city')
@@ -52,13 +64,11 @@ MOBILE=$(echo "$DATA" | jq -r '.mobile')
 PROXY=$(echo "$DATA" | jq -r '.proxy')
 HOSTING=$(echo "$DATA" | jq -r '.hosting')
 
-# Context inference
 TYPE="Residential / ISP"
 [[ "$HOSTING" == "true" ]] && TYPE="Datacenter / Hosting"
 [[ "$MOBILE" == "true" ]] && TYPE="Mobile Network"
 [[ "$PROXY" == "true" ]] && TYPE="Proxy / VPN Suspected"
 
-# Output
 echo -e "${ACCENT}Target${NC}        : $TARGET"
 echo -e "${ACCENT}Resolved IP${NC}   : $IP"
 echo
