@@ -14,7 +14,7 @@
 
   <pre id="tokenBox">loading...</pre>
 
-  <button onclick="copyToken()">Copy Token</button>
+  <button id="copyBtn">Copy Token</button>
 
   <div class="nav-links">
     <a href="about.html">About</a>
@@ -30,6 +30,7 @@
     "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
   const tokenBox = document.getElementById("tokenBox");
+  const copyBtn = document.getElementById("copyBtn");
 
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
@@ -47,18 +48,18 @@
       }
 
       tokenBox.innerText = snap.data().token;
-    } catch (err) {
+    } catch (e) {
       tokenBox.innerText = "Error loading token";
-      console.error(err);
+      console.error(e);
     }
   });
 
-  window.copyToken = () => {
+  copyBtn.onclick = () => {
     const token = tokenBox.innerText;
     if (!token || token === "loading...") return;
 
     navigator.clipboard.writeText(token);
-    alert("Token copied to clipboard");
+    alert("Token copied");
   };
 </script>
 
