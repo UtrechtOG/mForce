@@ -1,3 +1,22 @@
+// mForce Web Auth
+// Version: v0.03.1-web-auth-debug
+
+document.addEventListener("DOMContentLoaded", () => {
+  const badge = document.createElement("div");
+  badge.innerText = "mForce Web v0.03.1";
+  badge.style.position = "fixed";
+  badge.style.bottom = "10px";
+  badge.style.right = "10px";
+  badge.style.background = "#0a0f1e";
+  badge.style.color = "#6cf";
+  badge.style.border = "1px solid #263055";
+  badge.style.padding = "6px 10px";
+  badge.style.fontSize = "12px";
+  badge.style.borderRadius = "6px";
+  badge.style.zIndex = "9999";
+  document.body.appendChild(badge);
+});
+
 import { auth, db } from "./firebase.js";
 import {
   signInWithEmailAndPassword,
