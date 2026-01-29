@@ -13,13 +13,19 @@ import {
   setDoc
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
+/* ---------- SAFE TOKEN GENERATOR (MOBILE COMPATIBLE) ---------- */
 function generateToken() {
-  return "mf_" + crypto.randomUUID().replaceAll("-", "");
+  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let out = "mf_";
+  for (let i = 0; i < 32; i++) {
+    out += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return out;
 }
 
+/* ---------- UI & EVENTS ---------- */
 document.addEventListener("DOMContentLoaded", () => {
 
-  /* ---------- UI ---------- */
   const loginBox = document.getElementById("loginBox");
   const registerBox = document.getElementById("registerBox");
 
@@ -40,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loginBox.classList.remove("hidden");
   };
 
-  /* ---------- LOGIN ---------- */
+  // Email Login
   loginBtn.onclick = async () => {
     if (!document.getElementById("robotLogin").checked) {
       alert("Please confirm you are not a robot");
@@ -58,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  /* ---------- REGISTER ---------- */
+  // Register
   registerBtn.onclick = async () => {
     if (!document.getElementById("robotRegister").checked) {
       alert("Please confirm you are not a robot");
@@ -78,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  /* ---------- GOOGLE ---------- */
+  // Google Login
   googleBtn.onclick = async () => {
     if (!document.getElementById("robotLogin").checked) {
       alert("Please confirm you are not a robot");
@@ -95,8 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-/* ---------- AUTH STATE (GLOBAL) ---------- */
-
+/* ---------- AUTH STATE (TOKEN + REDIRECT) ---------- */
 onAuthStateChanged(auth, async (user) => {
   if (!user) return;
 
