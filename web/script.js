@@ -13,83 +13,89 @@ import {
   setDoc
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-/* ---------------- UI ---------------- */
-
-const loginBox = document.getElementById("loginBox");
-const registerBox = document.getElementById("registerBox");
-
-document.getElementById("showRegister").onclick = () => {
-  loginBox.classList.add("hidden");
-  registerBox.classList.remove("hidden");
-};
-
-document.getElementById("showLogin").onclick = () => {
-  registerBox.classList.add("hidden");
-  loginBox.classList.remove("hidden");
-};
-
-/* ---------------- TOKEN ---------------- */
-
 function generateToken() {
   return "mf_" + crypto.randomUUID().replaceAll("-", "");
 }
 
-/* ---------------- AUTH ACTIONS ---------------- */
+document.addEventListener("DOMContentLoaded", () => {
 
-// Email Login
-document.getElementById("loginBtn").onclick = async () => {
-  if (!document.getElementById("robotLogin").checked) {
-    alert("Please confirm you are not a robot");
-    return;
-  }
+  /* ---------- UI ---------- */
+  const loginBox = document.getElementById("loginBox");
+  const registerBox = document.getElementById("registerBox");
 
-  try {
-    await signInWithEmailAndPassword(
-      auth,
-      loginEmail.value,
-      loginPassword.value
-    );
-  } catch (e) {
-    alert(e.message);
-  }
-};
+  const showRegister = document.getElementById("showRegister");
+  const showLogin = document.getElementById("showLogin");
 
-// Register
-document.getElementById("registerBtn").onclick = async () => {
-  if (!document.getElementById("robotRegister").checked) {
-    alert("Please confirm you are not a robot");
-    return;
-  }
+  const loginBtn = document.getElementById("loginBtn");
+  const registerBtn = document.getElementById("registerBtn");
+  const googleBtn = document.getElementById("googleLogin");
 
-  try {
-    await createUserWithEmailAndPassword(
-      auth,
-      regEmail.value,
-      regPassword.value
-    );
-    alert("Account created. Please login.");
-    document.getElementById("showLogin").click();
-  } catch (e) {
-    alert(e.message);
-  }
-};
+  showRegister.onclick = () => {
+    loginBox.classList.add("hidden");
+    registerBox.classList.remove("hidden");
+  };
 
-// Google Login
-document.getElementById("googleLogin").onclick = async () => {
-  if (!document.getElementById("robotLogin").checked) {
-    alert("Please confirm you are not a robot");
-    return;
-  }
+  showLogin.onclick = () => {
+    registerBox.classList.add("hidden");
+    loginBox.classList.remove("hidden");
+  };
 
-  try {
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
-  } catch (e) {
-    alert(e.message);
-  }
-};
+  /* ---------- LOGIN ---------- */
+  loginBtn.onclick = async () => {
+    if (!document.getElementById("robotLogin").checked) {
+      alert("Please confirm you are not a robot");
+      return;
+    }
 
-/* ---------------- AUTH STATE (ZENTRAL) ---------------- */
+    try {
+      await signInWithEmailAndPassword(
+        auth,
+        loginEmail.value,
+        loginPassword.value
+      );
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
+  /* ---------- REGISTER ---------- */
+  registerBtn.onclick = async () => {
+    if (!document.getElementById("robotRegister").checked) {
+      alert("Please confirm you are not a robot");
+      return;
+    }
+
+    try {
+      await createUserWithEmailAndPassword(
+        auth,
+        regEmail.value,
+        regPassword.value
+      );
+      alert("Account created. Please login.");
+      showLogin.click();
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
+  /* ---------- GOOGLE ---------- */
+  googleBtn.onclick = async () => {
+    if (!document.getElementById("robotLogin").checked) {
+      alert("Please confirm you are not a robot");
+      return;
+    }
+
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
+});
+
+/* ---------- AUTH STATE (GLOBAL) ---------- */
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) return;
@@ -98,7 +104,6 @@ onAuthStateChanged(auth, async (user) => {
     const ref = doc(db, "users", user.uid);
     const snap = await getDoc(ref);
 
-    // 🔥 Token IMMER sicherstellen
     if (!snap.exists() || !snap.data().token) {
       await setDoc(ref, {
         token: generateToken(),
@@ -106,10 +111,8 @@ onAuthStateChanged(auth, async (user) => {
       }, { merge: true });
     }
 
-    // erst JETZT weiterleiten
     window.location.href = "web/token.html";
   } catch (err) {
-    alert("Token creation failed");
-    console.error(err);
+    alert("Token setup failed");
   }
 });
